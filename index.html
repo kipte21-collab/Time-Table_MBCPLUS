@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>급여업무대행 도입 일정표 (2026.08.01 기준) | 월급날</title>
+<style>
+  :root{
+    --navy:#1C2F4A; --navy-deep:#14233A; --gold:#C9A227; --gold-soft:#F6EFD8;
+    --line:#E4E8EF; --paper:#F7F8FA; --text:#334155; --muted:#94A3B8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+       background:var(--paper); color:var(--text); padding:16px;}
+  @media(min-width:640px){ body{padding:24px;} }
+
+  .wrap{max-width:100%; margin:0 auto;}
+
+  /* ── 헤더 ── */
+  .hero{background:var(--navy); border-radius:16px 16px 0 0; padding:18px 22px;
+        display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;}
+  .hero .eyebrow{color:var(--gold); font-size:11px; font-weight:800; letter-spacing:.18em;}
+  .hero h1{color:#fff; font-size:21px; font-weight:800; margin-top:4px;}
+  .hero .stats{display:flex; align-items:center; gap:16px; text-align:right;}
+  .hero .stat .lbl{color:#A9B6C9; font-size:11px;}
+  .hero .stat .val{color:#fff; font-size:18px; font-weight:800;}
+  .hero .stat .val.gold{color:var(--gold);}
+  .hero .divider{width:1px; height:38px; background:#3A4D6B;}
+
+  /* ── 컨트롤 패널 ── */
+  .controls{background:#fff; border:1px solid var(--line); border-top:none;
+            padding:12px 20px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;}
+  .controls .grow{flex:1;}
+  .field{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:#64748B;}
+  input[type=date]{height:42px; border:1px solid #CBD5E1; border-radius:10px; padding:0 10px;
+                   font-size:14px; font-weight:700; color:var(--text); font-family:inherit;}
+  input:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,162,39,.18);}
+  .btn{height:44px; padding:0 14px; border:none; border-radius:10px; font-size:13px; font-weight:800;
+       cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-family:inherit;
+       transition:opacity .12s, background .12s; touch-action:manipulation;}
+  .btn:active{opacity:.75;}
+  .btn-primary{background:var(--navy); color:#fff;}
+  .btn-gold{background:var(--gold); color:#fff;}
+  .btn-outline{background:#fff; color:var(--text); border:1px solid #CBD5E1;}
+  .btn-outline:hover{background:#F8FAFC;}
+  .btn-ghost{background:transparent; color:#94A3B8; border:1px solid var(--line);}
+  /* 주차별 표(캘린더형) */
+  .cal-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .cal-table th{background:var(--navy); color:#fff; padding:11px 12px; font-size:12px; font-weight:700;
+                text-align:left; position:sticky; top:0; z-index:10;}
+  .cal-table td{border-bottom:1px solid var(--line); padding:12px; vertical-align:top;}
+  .cal-table tr:nth-child(even) td{background:#FAFBFD;}
+  .cal-table .c-wk{width:96px;} .cal-table .c-date{width:84px;}
+  .cal-table .wk-no{font-weight:800; color:var(--navy); font-size:14px;}
+  .cal-table .c-date{color:var(--sub); font-size:11.5px; font-weight:700; white-space:nowrap; line-height:1.4;}
+  .cal-table .cat-group{margin-bottom:9px;}
+  .cal-table .cat-group:last-child{margin-bottom:0;}
+  .cat-chip{display:inline-block; font-size:10.5px; font-weight:800; color:#fff; padding:2px 9px;
+            border-radius:99px; margin-bottom:5px;}
+  .task-list{padding-left:1px;}
+  .t-item{font-size:12.5px; color:#3A4658; padding:2.5px 0; display:flex; align-items:baseline; gap:8px; line-height:1.4;}
+  .phase{font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:5px; flex-shrink:0;}
+  .p-start{background:var(--gold-soft); color:#8A6A12;}
+  .p-cont{background:#EEF1F6; color:#64748B;}
+  .p-end{background:#E6F4EC; color:#1E7A55;}
+  .no-task{color:#B6BECB; font-size:12px; font-style:italic;}
+  @media print{ .cal-table th{position:static;} .cal-table tr{break-inside:avoid;} }
+  .segs{display:inline-flex; border:1px solid var(--line); border-radius:10px; padding:3px; gap:2px;}
+  .seg-btn{height:36px; padding:0 13px; border:none; background:transparent; border-radius:8px;
+           cursor:pointer; font-size:12.5px; font-weight:800; color:#64748B; font-family:inherit; touch-action:manipulation;}
+  .seg-btn.on{background:var(--navy); color:#fff;}
+  .seg-btn:not(.on):hover{background:#F1F5F9;}
+  .seg-lab{font-size:10.5px; font-weight:800; color:var(--muted); align-self:center; margin:0 2px 0 4px;}
+  .week-cell{flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+             height:46px; border-right:1px solid #DDE3EC; font-size:12px;}
+  .week-cell.malt{background:#FAF6EC;}
+  .week-cell .wk{font-weight:800; color:var(--navy); font-size:11.5px;}
+  .week-cell .wr{font-size:9.5px; color:var(--muted); margin-top:1px;}
+  .grp-bar.fill{height:26px; border-radius:8px; display:flex; align-items:center; padding:0 8px;
+                box-shadow:0 1px 2px rgba(20,35,58,.18); border:none;}
+  .grp-bar.fill span{color:#fff; font-size:11px; font-weight:800; white-space:nowrap; overflow:hidden;}
+  .grp-row.sum{min-height:50px;}
+  .grp-name .gr-date{font-size:10.5px; color:var(--muted); font-weight:700; flex-shrink:0; white-space:nowrap;}
+  .zoom{display:flex; gap:2px; border:1px solid var(--line); border-radius:10px; padding:3px;}
+  .zoom button{width:38px; height:36px; border:none; background:transparent; border-radius:8px;
+               cursor:pointer; font-size:17px; color:#64748B; font-weight:800;}
+  .zoom button:hover{background:#F1F5F9;}
+  .save-state{font-size:11px; color:var(--muted);}
+
+  /* ── 차트 컨테이너 ── */
+  .chart-box{background:#fff; border:1px solid var(--line); border-top:none;
+             border-radius:0 0 16px 16px; overflow:auto; max-height:68vh;}
+  .chart-inner{min-width:100%;}
+
+  .row{display:flex; border-bottom:1px solid var(--line);}
+  .left-cell{position:sticky; left:0; z-index:20; background:#fff; display:flex; align-items:stretch;
+             border-right:1px solid var(--line); flex-shrink:0;}
+  .no-cell{display:flex; align-items:center; justify-content:center; font-size:11.5px;
+           font-weight:700; color:var(--muted); flex-shrink:0;}
+  .timeline{position:relative; flex-shrink:0;}
+  .day-bg{position:absolute; inset:0; display:flex;}
+  .day-bg .cell{flex-shrink:0; border-right:1px solid #EEF1F6; height:100%;}
+  .day-bg .cell.malt{background:#FAF6EC;}
+  .day-bg .cell.weekend{background:#F1F4F8;}
+  .day-bg .cell.malt.weekend{background:#EEEAE0;}
+  .day-bg .cell.mstart{border-left:2px solid #93A3BC;}
+  .today-line{position:absolute; top:0; bottom:0; width:2px; background:var(--gold); z-index:5;}
+
+  /* 헤더 행 */
+  .head-sticky{position:sticky; top:0; z-index:30;}
+  .month-row{display:flex; background:var(--navy-deep);}
+  .month-row .left-cell{background:var(--navy-deep); border-right:1px solid #2A3D5C; z-index:40;
+                        align-items:center; padding:0 14px; color:#A9B6C9; font-size:11px;
+                        font-weight:800; letter-spacing:.12em; height:32px;}
+  .month-cell{flex-shrink:0; display:flex; align-items:center; padding:0 10px; height:32px;
+              border-left:3px solid var(--gold); color:#fff; font-size:12px; font-weight:800; overflow:hidden; white-space:nowrap;}
+  .month-cell.alt{background:#2C4C7A;}
+  .day-row{display:flex; background:#F8FAFC; border-bottom:1px solid var(--line);}
+  .day-row .left-cell{background:#F8FAFC; z-index:40; align-items:center; height:46px;}
+  .day-row .left-cell .col-lbl{font-size:11px; font-weight:800; color:var(--muted); padding:0 8px;}
+  .day-cell{flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+            height:46px; border-right:1px solid #EEF1F6; font-size:12px;}
+  .day-cell.malt{background:#FAF6EC;}
+  .day-cell.weekend{background:#F1F4F8;}
+  .day-cell.malt.weekend{background:#EEEAE0;}
+  .day-cell.mstart{border-left:2px solid #93A3BC;}
+  .day-cell .d{font-weight:800; color:#475569;}
+  .day-cell .d.sun{color:#F87171;} .day-cell .d.sat{color:#60A5FA;} .day-cell .d.today{color:#D97706;}
+  .day-cell .d.first{color:var(--navy); font-size:11px; letter-spacing:-0.5px;}
+  .day-cell .w{font-size:9.5px; color:var(--muted);}
+
+  /* 대분류 행 */
+  .cat-row{min-height:48px; background:#FBFCFE;}
+  .cat-row .left-cell{background:#FBFCFE;}
+  .cat-badge{width:54px; color:#fff; font-size:14px; font-weight:800; display:flex;
+             align-items:center; justify-content:center; flex-shrink:0;}
+  .cat-name{font-size:14px; font-weight:800; padding:0 12px; display:flex; align-items:center;
+            overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+  .cat-bar{position:absolute; top:50%; transform:translateY(-50%); height:6px; border-radius:99px;
+           opacity:.32; z-index:4;}
+
+  /* 중분류 행 */
+  .grp-row{min-height:42px;}
+  .grp-name{font-size:12.5px; font-weight:800; color:#475569; padding:4px 10px 4px 14px;
+            display:flex; align-items:center; gap:7px; flex:1; min-width:0; flex-wrap:wrap;}
+  .grp-name .gname-text{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;}
+  .grp-dot{width:8px; height:8px; border-radius:3px; flex-shrink:0;}
+  .grp-bar{position:absolute; top:50%; transform:translateY(-50%); height:12px; border-radius:6px;
+           z-index:4;}
+
+  /* 소분류(업무) 행 */
+  .task-row{min-height:56px;}
+  .task-info{padding:7px 12px 7px 26px; min-width:0; flex:1; display:flex; flex-direction:column; justify-content:center;}
+  .task-info .nm{font-size:13.5px; font-weight:700; color:#334155; overflow:hidden;
+                 display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+                 line-height:1.3; word-break:break-all;}
+  .task-info .rng{font-size:11.5px; color:var(--muted); margin-top:3px; white-space:nowrap; flex-shrink:0;}
+  .bar{position:absolute; top:50%; transform:translateY(-50%); height:30px; border-radius:9px;
+       z-index:4; display:flex; align-items:center; padding:0 8px; box-shadow:0 1px 2px rgba(20,35,58,.18);}
+  .bar span{color:#fff; font-size:11.5px; font-weight:800; white-space:nowrap; overflow:hidden;}
+  .bar.sm{padding:0; justify-content:center;}
+  .bar.sm span{font-size:9px; letter-spacing:-0.5px;}
+  .bar.xs{padding:0; justify-content:center;}
+  .bar.xs span{font-size:8px; letter-spacing:-0.5px;}
+
+  /* 편집 모드 위젯 */
+  .edit-box{display:flex; align-items:center; gap:4px; padding:7px 8px; min-width:0; flex:1;}
+  .edit-box input[type=text]{height:40px; flex:1; min-width:0; border:1px solid #CBD5E1;
+        border-radius:9px; padding:0 9px; font-size:13px; font-family:inherit; color:#334155;}
+  .edit-box input[type=number]{height:40px; width:54px; border:1px solid #CBD5E1; border-radius:9px;
+        text-align:center; font-size:13px; font-weight:700; font-family:inherit; color:#334155;}
+  .icon-btn{width:32px; height:40px; border:none; background:transparent; border-radius:8px;
+            cursor:pointer; color:#94A3B8; font-size:14px; display:flex; align-items:center;
+            justify-content:center; flex-shrink:0; touch-action:manipulation;}
+  .icon-btn:hover{background:#F1F5F9;}
+  .icon-btn.del:hover{background:#FEF2F2; color:#EF4444;}
+  .icon-btn.add{color:var(--gold); font-size:19px;}
+  .icon-btn.add:hover{background:var(--gold-soft);}
+  .add-row .left-cell{padding:5px 8px;}
+  .add-btn{width:100%; height:38px; border:1.5px dashed #CBD5E1; background:transparent;
+           border-radius:10px; color:#94A3B8; font-size:12px; font-weight:800; cursor:pointer;
+           font-family:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .add-btn:hover{border-color:var(--gold); color:#B8860B; background:var(--gold-soft);}
+  .add-btn.lv3{margin-left:18px; width:calc(100% - 18px);}
+
+  .empty{padding:60px 20px; text-align:center; color:var(--muted); font-size:14px;}
+  .empty .btn{margin-top:14px;}
+
+  /* 범례 */
+  .legend{margin-top:12px; padding:0 4px; display:flex; flex-wrap:wrap; gap:8px 20px;
+          font-size:12px; color:#64748B; align-items:center;}
+  .chip{display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-right:5px;}
+
+  /* ── 인쇄: 방향은 JS(pageRule)에서 동적 제어 ── */
+  body.printing .chart-box{max-height:none; overflow:visible;}
+  @media print{
+    body{padding:0; background:#fff;}
+    .controls, .legend, .no-print{display:none !important;}
+    .chart-box{max-height:none !important; overflow:visible !important; border-radius:0;}
+    body.print-portrait .wrap{width:100% !important; max-width:100% !important;}
+    body.print-portrait .cal-table th{position:static !important;}
+    body.print-portrait thead{display:table-header-group;}  /* 페이지마다 머리행 반복 */
+    .hero{border-radius:0;}
+    .head-sticky, .left-cell{position:static !important;}
+    *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  }
+
+@page{ size:A4 landscape; margin:8mm; }
+/* 고객용: 차트 내부 스크롤로 달력 헤더 상시 고정 */
+html,body{height:100%;}
+body{display:flex; flex-direction:column; overflow:hidden;}
+.wrap{display:flex; flex-direction:column; flex:1; min-height:0; width:100%;}
+.hero{flex-shrink:0;}
+.chart-box{flex:1; min-height:0; max-height:none;}
+.legend{flex-shrink:0;}
+@media print{ html,body{height:auto; overflow:visible; display:block;} .wrap{display:block;} }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+<div class="hero">
+    <div>
+      <div class="eyebrow">PAYDAY ONBOARDING PLAN</div>
+      <h1>급여업무대행 도입 일정표</h1>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="lbl">완료 예정일</div><div class="val" id="statEnd">2026.10.23</div></div>
+      <div class="divider"></div>
+      <div class="stat"><div class="lbl">총 소요기간</div><div class="val gold" id="statSpan">84일 (12주)</div></div>
+    </div>
+  </div>
+<div class="chart-box"><div class="chart-inner" id="chart" style="width:2080px"><div class="head-sticky"><div class="month-row"><div class="left-cell" style="width:340px;min-width:340px">업무 구분</div><div class="month-cell alt" style="width:620px">2026년 8월</div><div class="month-cell" style="width:600px">2026년 9월</div><div class="month-cell alt" style="width:520px">2026년 10월</div></div><div class="day-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px;height:100%">No</div><div class="col-lbl">대분류 · 중분류 · 소분류</div></div><div class="week-cell malt" style="width:140px"><span class="wk">1주차</span><span class="wr">8/1~8/7</span></div><div class="week-cell malt" style="width:140px"><span class="wk">2주차</span><span class="wr">8/8~8/14</span></div><div class="week-cell malt" style="width:140px"><span class="wk">3주차</span><span class="wr">8/15~8/21</span></div><div class="week-cell malt" style="width:140px"><span class="wk">4주차</span><span class="wr">8/22~8/28</span></div><div class="week-cell malt" style="width:140px"><span class="wk">5주차</span><span class="wr">8/29~9/4</span></div><div class="week-cell" style="width:140px"><span class="wk">6주차</span><span class="wr">9/5~9/11</span></div><div class="week-cell" style="width:140px"><span class="wk">7주차</span><span class="wr">9/12~9/18</span></div><div class="week-cell" style="width:140px"><span class="wk">8주차</span><span class="wr">9/19~9/25</span></div><div class="week-cell" style="width:140px"><span class="wk">9주차</span><span class="wr">9/26~10/2</span></div><div class="week-cell malt" style="width:140px"><span class="wk">10주차</span><span class="wr">10/3~10/9</span></div><div class="week-cell malt" style="width:140px"><span class="wk">11주차</span><span class="wr">10/10~10/16</span></div><div class="week-cell malt" style="width:140px"><span class="wk">12주차</span><span class="wr">10/17~10/23</span></div><div class="week-cell malt" style="width:60px"><span class="wk">13주차</span><span class="wr">10/24~10/26</span></div></div></div><div class="row cat-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="cat-badge" style="background:#2C456B">1</div><div class="cat-name" style="color:#2C456B">계약 및 업무준비</div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="cat-bar" style="left:42px;width:296px;background:#2C456B"></div></div></div><div class="row grp-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-1</div><div class="grp-name"><span class="grp-dot" style="background:#2C456B"></span><span class="gname-text">계약(계약서 검토 및 계약체결)</span></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="grp-bar" style="left:42px;width:196px;background:#2C456B33;border:1.5px solid #2C456B"></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-1-1</div><div class="task-info"><div class="nm">계약서 초안 검토 요청</div><div class="rng">8/3(월) ~ 8/9(일) · 7일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar" style="left:42px;width:136px;background:#2C456B" title="계약서 초안 검토 요청 / 8/3(월) ~ 8/9(일) (7일)"><span>7일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-1-2</div><div class="task-info"><div class="nm">계약체결</div><div class="rng">8/10(월) ~ 8/12(수) · 3일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar sm" style="left:182px;width:56px;background:#2C456B" title="계약체결 / 8/10(월) ~ 8/12(수) (3일)"><span>3일</span></div></div></div><div class="row grp-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-2</div><div class="grp-name"><span class="grp-dot" style="background:#2C456B"></span><span class="gname-text">업무준비(업무범위 확정 및 도입자료안내)</span></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="grp-bar" style="left:42px;width:296px;background:#2C456B33;border:1.5px solid #2C456B"></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-2-1</div><div class="task-info"><div class="nm">업무범위 확정</div><div class="rng">8/3(월) ~ 8/12(수) · 10일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar" style="left:42px;width:196px;background:#2C456B" title="업무범위 확정 / 8/3(월) ~ 8/12(수) (10일)"><span>10일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-2-2</div><div class="task-info"><div class="nm">도입자료안내(월급날)</div><div class="rng">8/3(월) ~ 8/4(화) · 2일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar sm" style="left:42px;width:36px;background:#2C456B" title="도입자료안내(월급날) / 8/3(월) ~ 8/4(화) (2일)"><span>2일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">1-2-3</div><div class="task-info"><div class="nm">담당자배정(계약체결후)</div><div class="rng">8/15(토) ~ 8/17(월) · 3일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar sm" style="left:282px;width:56px;background:#2C456B" title="담당자배정(계약체결후) / 8/15(토) ~ 8/17(월) (3일)"><span>3일</span></div></div></div><div class="row cat-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="cat-badge" style="background:#C9A227">2</div><div class="cat-name" style="color:#C9A227">도입업무</div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="cat-bar" style="left:342px;width:896px;background:#C9A227"></div></div></div><div class="row grp-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-1</div><div class="grp-name"><span class="grp-dot" style="background:#C9A227"></span><span class="gname-text">도입자료 작성 및 전달(엠비씨플러스)</span></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="grp-bar" style="left:342px;width:236px;background:#C9A22733;border:1.5px solid #C9A227"></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-1-1</div><div class="task-info"><div class="nm">도입자료 전달(엠비씨플러스)</div><div class="rng">8/18(화) ~ 8/29(토) · 12일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar" style="left:342px;width:236px;background:#C9A227" title="도입자료 전달(엠비씨플러스) / 8/18(화) ~ 8/29(토) (12일)"><span>12일</span></div></div></div><div class="row grp-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-2</div><div class="grp-name"><span class="grp-dot" style="background:#C9A227"></span><span class="gname-text">도입진행(월급날)</span></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="grp-bar" style="left:582px;width:656px;background:#C9A22733;border:1.5px solid #C9A227"></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-2-1</div><div class="task-info"><div class="nm">인사정보 및 시스템 셋업</div><div class="rng">8/30(일) ~ 9/28(월) · 30일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar" style="left:582px;width:596px;background:#C9A227" title="인사정보 및 시스템 셋업 / 8/30(일) ~ 9/28(월) (30일)"><span>30일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-2-2</div><div class="task-info"><div class="nm">급여체계 분석 및 시스템 셋업</div><div class="rng">8/30(일) ~ 9/28(월) · 30일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar" style="left:582px;width:596px;background:#C9A227" title="급여체계 분석 및 시스템 셋업 / 8/30(일) ~ 9/28(월) (30일)"><span>30일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-2-3</div><div class="task-info"><div class="nm">이전 급여데이터 업로드(3년)</div><div class="rng">8/30(일) ~ 9/28(월) · 30일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar" style="left:582px;width:596px;background:#C9A227" title="이전 급여데이터 업로드(3년) / 8/30(일) ~ 9/28(월) (30일)"><span>30일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-2-4</div><div class="task-info"><div class="nm">도입 완료 및 고객사 안내</div><div class="rng">9/29(화) ~ 9/30(수) · 2일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar sm" style="left:1182px;width:36px;background:#C9A227" title="도입 완료 및 고객사 안내 / 9/29(화) ~ 9/30(수) (2일)"><span>2일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">2-2-5</div><div class="task-info"><div class="nm">업무시작(월급날)</div><div class="rng">10/1(목) ~ 10/1(목) · 1일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar xs" style="left:1222px;width:16px;background:#C9A227" title="업무시작(월급날) / 10/1(목) ~ 10/1(목) (1일)"><span>1</span></div></div></div><div class="row cat-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="cat-badge" style="background:#3D7068">3</div><div class="cat-name" style="color:#3D7068">급여업무대행</div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="cat-bar" style="left:1482px;width:196px;background:#3D7068"></div></div></div><div class="row grp-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">3-1</div><div class="grp-name"><span class="grp-dot" style="background:#3D7068"></span><span class="gname-text">10월 급여업무처리</span></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="grp-bar" style="left:1482px;width:196px;background:#3D706833;border:1.5px solid #3D7068"></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">3-1-1</div><div class="task-info"><div class="nm">10월 인사급여 변동자료 요청(월급날)</div><div class="rng">10/14(수) ~ 10/14(수) · 1일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar xs" style="left:1482px;width:16px;background:#3D7068" title="10월 인사급여 변동자료 요청(월급날) / 10/14(수) ~ 10/14(수) (1일)"><span>1</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">3-1-2</div><div class="task-info"><div class="nm">10월 인사급여 변동자료 전달(엠비씨플러스)</div><div class="rng">10/15(목) ~ 10/16(금) · 2일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar sm" style="left:1502px;width:36px;background:#3D7068" title="10월 인사급여 변동자료 전달(엠비씨플러스) / 10/15(목) ~ 10/16(금) (2일)"><span>2일</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">3-1-3</div><div class="task-info"><div class="nm">10월 급여처리 및 마감안내(월급날)</div><div class="rng">10/20(화) ~ 10/20(화) · 1일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar xs" style="left:1602px;width:16px;background:#3D7068" title="10월 급여처리 및 마감안내(월급날) / 10/20(화) ~ 10/20(화) (1일)"><span>1</span></div></div></div><div class="row task-row"><div class="left-cell" style="width:340px;min-width:340px"><div class="no-cell" style="width:54px">3-1-4</div><div class="task-info"><div class="nm">10월 급여지급 / 급여명세서발송</div><div class="rng">10/23(금) ~ 10/23(금) · 1일</div></div></div><div class="timeline" style="width:1740px"><div class="day-bg"><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:140px"></div><div class="cell malt" style="width:60px"></div></div><div class="bar xs" style="left:1662px;width:16px;background:#3D7068" title="10월 급여지급 / 급여명세서발송 / 10/23(금) ~ 10/23(금) (1일)"><span>1</span></div></div></div></div></div>
+<div class="legend"><span><span class="chip" style="background:#C9A227"></span>오늘</span><span><span class="chip" style="background:#E2E8F0"></span>주말</span><span>기준일 2026.08.01 (D+0) 기준 일정입니다. 본 일정표는 협의에 따라 변경될 수 있습니다.</span></div>
+</div>
+<script>
+var PW=1040,PH=710;
+window.addEventListener("beforeprint",function(){
+  var w=document.getElementById("wrap"),c=document.getElementById("chart"),h=document.querySelector(".hero");
+  var cw=Math.max(c.scrollWidth,h.scrollWidth),ch=h.offsetHeight+c.scrollHeight+10;
+  w.style.zoom=Math.min(1,PW/cw,PH/ch);
+});
+window.addEventListener("afterprint",function(){document.getElementById("wrap").style.zoom="";});
+</script>
+</body>
+</html>
